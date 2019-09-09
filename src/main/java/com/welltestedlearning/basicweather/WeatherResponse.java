@@ -1,53 +1,25 @@
 package com.welltestedlearning.basicweather;
 
+import com.welltestedlearning.basicweather.provider.weatherstack.Current;
+import com.welltestedlearning.basicweather.provider.weatherstack.WeatherStackResponse;
+import lombok.Data;
+
+@Data
 public class WeatherResponse {
   private String location;
   private String updated;
-  private Float temp;
+  private Integer temp;
   private String condition;
 
-  public static WeatherResponse from(ApixuWeather apixuWeather) {
+  public static WeatherResponse from(WeatherStackResponse weatherStackResponse) {
     WeatherResponse weatherResponse = new WeatherResponse();
-    weatherResponse.location = apixuWeather.getLocation().getName() + ", "
-        + apixuWeather.getLocation().getRegion();
+    weatherResponse.location = weatherStackResponse.getLocation().getName() + ", "
+        + weatherStackResponse.getLocation().getRegion();
 
-    Current current = apixuWeather.getCurrent();
-    weatherResponse.updated = current.getLast_updated();
-    weatherResponse.temp = current.getTemp_f();
-    weatherResponse.condition = current.getCondition().getText();
+    Current current = weatherStackResponse.getCurrent();
+    weatherResponse.updated = weatherStackResponse.getLocation().getLocaltime();
+    weatherResponse.temp = current.getTemperature();
+    weatherResponse.condition = String.join(", ", current.getWeatherDescriptions());
     return weatherResponse;
   }
-
-  public String getLocation() {
-    return location;
-  }
-
-  public void setLocation(String location) {
-    this.location = location;
-  }
-
-  public String getUpdated() {
-    return updated;
-  }
-
-  public void setUpdated(String updated) {
-    this.updated = updated;
-  }
-
-  public Float getTemp() {
-    return temp;
-  }
-
-  public void setTemp(Float temp) {
-    this.temp = temp;
-  }
-
-  public String getCondition() {
-    return condition;
-  }
-
-  public void setCondition(String condition) {
-    this.condition = condition;
-  }
-
 }
