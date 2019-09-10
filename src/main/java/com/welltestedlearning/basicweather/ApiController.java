@@ -1,6 +1,5 @@
 package com.welltestedlearning.basicweather;
 
-import com.welltestedlearning.basicweather.provider.weatherstack.WeatherStackResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -32,15 +31,19 @@ public class ApiController {
         return false;
       }
     });
-    ResponseEntity<WeatherStackResponse> weatherStackResponseEntity =
-        restTemplate.getForEntity(WEATHER_STACK_URL, WeatherStackResponse.class, API_KEY, zipCode);
+//    ResponseEntity<WeatherStackResponse> weatherStackResponseEntity =
+//        restTemplate.getForEntity(WEATHER_STACK_URL, WeatherStackResponse.class, API_KEY, zipCode);
+    ResponseEntity<String> responseEntity =
+        restTemplate.getForEntity(WEATHER_STACK_URL, String.class, API_KEY, zipCode);
+    log.warn("String response: {}", responseEntity.getBody());
+    log.warn("Headers: {}", responseEntity.getHeaders());
 
-    if (weatherStackResponseEntity.getStatusCode().is2xxSuccessful()) {
-      return weatherStackResponseEntity.getBody().toReponseEntity();
-    }
-
-    log.warn("Non-successful status code: {}", weatherStackResponseEntity.getStatusCode());
-    log.warn("Headers: {}", weatherStackResponseEntity.getHeaders());
+//    if (weatherStackResponseEntity.getStatusCode().is2xxSuccessful()) {
+//      return weatherStackResponseEntity.getBody().toReponseEntity();
+//    }
+//
+//    log.warn("Non-successful status code: {}", weatherStackResponseEntity.getStatusCode());
+//    log.warn("Headers: {}", weatherStackResponseEntity.getHeaders());
 
     return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new WeatherResponse());
   }
