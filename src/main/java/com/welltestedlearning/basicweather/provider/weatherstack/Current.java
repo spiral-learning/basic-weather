@@ -17,7 +17,6 @@ public class Current {
   private String observationTime;
   private long precip;
   private long pressure;
-  @JsonProperty("temparature")
   private int temperature;
   @JsonProperty("uv_index")
   private long uvIndex;

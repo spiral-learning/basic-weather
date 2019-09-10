@@ -1,6 +1,5 @@
 package com.welltestedlearning.basicweather;
 
-import com.welltestedlearning.basicweather.provider.weatherstack.WeatherStackError;
 import com.welltestedlearning.basicweather.provider.weatherstack.WeatherStackResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,30 +22,17 @@ public class ApiController {
 
   @GetMapping("/zip/{zip}")
   public ResponseEntity<WeatherResponse> findWeather(@PathVariable("zip") String zipCode) {
-    WeatherStackResponse weatherStackResponse =
-        restTemplate.getForObject(WEATHER_STACK_URL, WeatherStackResponse.class, API_KEY, zipCode);
+    ResponseEntity<WeatherStackResponse> weatherStackResponseEntity =
+        restTemplate.getForEntity(WEATHER_STACK_URL, WeatherStackResponse.class, API_KEY, zipCode);
 
-    return toResponseEntity(weatherStackResponse);
-  }
-
-  private ResponseEntity<WeatherResponse> toResponseEntity(WeatherStackResponse weatherStackResponse) {
-    ResponseEntity<WeatherResponse> responseEntity;
-    if (weatherStackResponse.succeeded()) {
-      WeatherResponse response = WeatherResponse.from(weatherStackResponse);
-      responseEntity = ResponseEntity.ok(response);
-    } else {
-      responseEntity = createUnavailableResponse(weatherStackResponse);
+    if (weatherStackResponseEntity.getStatusCode().is2xxSuccessful()) {
+      return weatherStackResponseEntity.getBody().toReponseEntity();
     }
-    return responseEntity;
-  }
 
-  private ResponseEntity<WeatherResponse> createUnavailableResponse(WeatherStackResponse weatherStackResponse) {
-    WeatherStackError error = weatherStackResponse.getWeatherStackError();
-    log.warn("WeatherStack error: code = {}, type = '{}', info = '{}'",
-             error.getCode(),
-             error.getType(),
-             error.getInfo());
-    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new WeatherResponse());
+    log.warn("Non-successful status code: {}", weatherStackResponseEntity.getStatusCode());
+    log.warn("Headers: {}", weatherStackResponseEntity.getHeaders());
+
+    return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new WeatherResponse());
   }
 
   @ExceptionHandler
