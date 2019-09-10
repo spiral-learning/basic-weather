@@ -23,19 +23,28 @@ public class WeatherStackResponse {
     return weatherStackError == null;
   }
 
-  public ResponseEntity<WeatherResponse> toReponseEntity() {
+  public ResponseEntity<WeatherResponse> toResponseEntity() {
     ResponseEntity<WeatherResponse> responseEntity;
     if (succeeded()) {
-      WeatherResponse response = WeatherResponse.from(this);
+      WeatherResponse response = toResponse();
       responseEntity = ResponseEntity.ok(response);
     } else {
-      responseEntity = createUnavailableResponse(this);
+      responseEntity = createUnavailableResponse();
     }
     return responseEntity;
   }
 
-  private ResponseEntity<WeatherResponse> createUnavailableResponse(WeatherStackResponse weatherStackResponse) {
-    WeatherStackError error = weatherStackResponse.getWeatherStackError();
+  private WeatherResponse toResponse() {
+    WeatherResponse weatherResponse = new WeatherResponse();
+    weatherResponse.setLocation(getLocation().getName() + ", " + getLocation().getRegion());
+    weatherResponse.setUpdated(getLocation().getLocaltime());
+    weatherResponse.setTemp(getCurrent().getTemperature());
+    weatherResponse.setCondition(String.join(", ", getCurrent().getWeatherDescriptions()));
+    return weatherResponse;
+  }
+
+  private ResponseEntity<WeatherResponse> createUnavailableResponse() {
+    WeatherStackError error = getWeatherStackError();
     log.warn("WeatherStack error: code = {}, type = '{}', info = '{}'",
              error.getCode(),
              error.getType(),
