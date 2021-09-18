@@ -15,26 +15,26 @@ import java.util.Map;
 @Service
 public class OpenWeatherMapService implements WeatherService {
 
-  private static final String ZIP_API_URL = "https://api.openweathermap.org/data/2.5/weather?zip={zip}&units=imperial&appid={appid}";
+    private static final String ZIP_API_URL = "https://api.openweathermap.org/data/2.5/weather?zip={zip}&units=imperial&appid={appid}";
 
-  private final String openWeatherMapAppId;
-  private final RestTemplate restTemplate = new RestTemplate();
+    private final String openWeatherMapAppId;
+    private final RestTemplate restTemplate = new RestTemplate();
 
-  public OpenWeatherMapService(@Value("${openweathermap.app.id}") String openWeatherMapAppId) {
-    this.openWeatherMapAppId = openWeatherMapAppId;
-  }
+    public OpenWeatherMapService(@Value("${openweathermap.app.id}") String openWeatherMapAppId) {
+        this.openWeatherMapAppId = openWeatherMapAppId;
+    }
 
-  @Override
-  public ResponseEntity<WeatherResponse> current(String zipCode) {
-    Map<String, String> uriVariables = new HashMap<>();
-    uriVariables.put("zip", zipCode);
-    uriVariables.put("appid", openWeatherMapAppId);
+    @Override
+    public ResponseEntity<WeatherResponse> current(String zipCode) {
+        Map<String, String> uriVariables = new HashMap<>();
+        uriVariables.put("zip", zipCode);
+        uriVariables.put("appid", openWeatherMapAppId);
 
-    ResponseEntity<OpenWeatherMapResponse> weatherStackResponseEntity =
-        restTemplate.getForEntity(ZIP_API_URL,
-                                  OpenWeatherMapResponse.class,
-                                  uriVariables);
+        ResponseEntity<OpenWeatherMapResponse> weatherStackResponseEntity =
+                restTemplate.getForEntity(ZIP_API_URL,
+                                          OpenWeatherMapResponse.class,
+                                          uriVariables);
 
-    return weatherStackResponseEntity.getBody().toResponseEntity();
-  }
+        return weatherStackResponseEntity.getBody().toResponseEntity();
+    }
 }

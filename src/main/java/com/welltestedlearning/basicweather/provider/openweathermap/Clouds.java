@@ -1,11 +1,14 @@
 package com.welltestedlearning.basicweather.provider.openweathermap;
 
-import lombok.Data;
-
-@Data
-@SuppressWarnings("unused")
 public class Clouds {
 
-  private long all;
+    private long all;
 
+    public long getAll() {
+        return all;
+    }
+
+    public void setAll(long all) {
+        this.all = all;
+    }
 }
